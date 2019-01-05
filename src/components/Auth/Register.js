@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { Grid, Form, Button, Header, Message, Icon, Segment } from 'semantic-ui-react';
 import { Link } from 'react-router-dom';
 import firebase from '../../firebase';
+import md5 from 'md5';
 
 class Register extends Component {
 
@@ -11,7 +12,8 @@ class Register extends Component {
         password: '',
         passwordConfirm: '',
         errors: [],
-        loading: false
+        loading: false,
+        usersRef: firebase.database().ref('users')
     };
 
 
@@ -77,7 +79,25 @@ class Register extends Component {
                 .createUserAndRetrieveDataWithEmailAndPassword(this.state.email, this.state.password)
                 .then(createdUser => {
                     console.log(createdUser)
-                    this.setState({ loading: false });
+                    // setting firebase user object properties with state username and randomly generated avatar using md5
+                    createdUser.user.updateProfile({
+                        displayName: this.state.username,
+                        photoURL: `http://gravatar.com/avatar/${md5(createdUser.user.email)}?d=identicon`
+
+                    })
+                        .then(() => {
+                            this.saveUser(createdUser).then(() => {
+                                console.log('user saved');
+                            })
+                            // this.setState({ loading: false });
+                        })
+                        .catch(err => {
+                            console.log(err);
+                            this.setState({
+                                errors: this.state.errors.concat(err),
+                                loading: false
+                            })
+                        })
                 })
                 .catch(err => {
                     console.log(err);
@@ -88,6 +108,15 @@ class Register extends Component {
                 });
         }
 
+    }
+
+    // method to save user ID to FB database
+    saveUser = createdUser => {
+        console.log(this.state.usersRef);
+        return this.state.usersRef.child(createdUser.user.uid).set({
+            name: createdUser.user.displayName,
+            avatar: createdUser.user.photoURL
+        });
     }
 
     // method that handles each error per input
