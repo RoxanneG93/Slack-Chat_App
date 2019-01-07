@@ -1,21 +1,21 @@
 import React, { Component } from 'react';
-import { Grid, Header, Icon, Dropdown } from 'semantic-ui-react';
+import { Grid, Header, Icon, Dropdown, Image } from 'semantic-ui-react';
 import firebase from '../../firebase';
 
 import { connect } from 'react-redux';
 
 class UserPanel extends Component {
 
-    // inital state
+    // initial state
     state = {
-        user: null,
+        user: this.props.currentUser,
 
     }
 
     // will mount current user to set userPanel state
-    componentWillreceiveProps(nextProps) {
-        this.setState({ user: nextProps.currentUser });
-    }
+    // componentWillreceiveProps(nextProps) {
+    //     this.setState({ user: nextProps.currentUser });
+    // }
 
     dropdownOptions = () => [
         {
@@ -41,7 +41,11 @@ class UserPanel extends Component {
     }
 
     render() {
-        // console.log(this.props.currentUser);
+        //  Logs current user from props
+        console.log(this.props.currentUser);
+
+
+        const { user } = this.state;
 
         return (
             <Grid style={{ background: '#4c3c4c' }}>
@@ -52,19 +56,27 @@ class UserPanel extends Component {
                             <Icon name="code" />
                             <Header.Content>DevChat</Header.Content>
                         </Header>
+                        <Header style={{ padding: '0.25em' }} as="h4" inverted>
+                            {/* User DropDown */}
+                            <Dropdown
+                                trigger={
+                                    <span>
+                                        <Image src={user.photoURL} spaced="right" avatar />
+                                        {this.state.user.displayName}
+                                    </span>}
+                                options={this.dropdownOptions()}
+                            />
+                        </Header>
                     </Grid.Row>
-                    {/* User DropDown */}
-                    <Header style={{ padding: '0.25em' }} as="h4" inverted>
-                        <Dropdown trigger={<span>User</span>} options={this.dropdownOptions()} />
-                    </Header>
                 </Grid.Column>
             </Grid>
         )
     }
 }
 
+// grab current user from global state and set component UserPanel state to props
 const mapStateToProps = state => ({
     currentUser: state.user.currentUser
-})
+});
 
 export default connect(mapStateToProps)(UserPanel);
