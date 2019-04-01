@@ -25,7 +25,7 @@ const App = ({ currentUser }) => (
   </Grid>
 )
 
-// grabbing state to props from redux using connect
+// setting state to props from redux using connect
 const mapStateToProps = state => ({
   currentUser: state.user.currentUser
 })

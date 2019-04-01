@@ -2,7 +2,8 @@ html,
 body,
 .app {
     height: 100vh;
-    background: #eee;
+    background: pink;
     padding: 1em;
+    border: red;
 
 }
